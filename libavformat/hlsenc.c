@@ -98,9 +98,10 @@ static int append_entry(HLSContext *hls, int64_t duration)
         return AVERROR(ENOMEM);
 
     av_strlcpy(en->name, av_basename(hls->avf->filename), sizeof(en->name));
-
+    av_log(NULL, AV_LOG_INFO, "EXT-X-SEGMENTFILE:%s\n", en->name); // every .ts file is completed .TSTS
     en->duration = duration;
     en->next     = NULL;
+    av_log(NULL, AV_LOG_INFO, "EXTINF:%"PRId64"\n",av_rescale(en->duration, 1, AV_TIME_BASE)); // every .ts file completed duration .TSTS
 
     if (!hls->list)
         hls->list = en;
@@ -183,6 +184,7 @@ fail:
     ff_format_io_close(s, &out);
     if (ret >= 0)
         ff_rename(temp_filename, s->filename);
+    av_log(NULL, AV_LOG_INFO, "EXT-X-MEDIA-SEQUENCE:%"PRId64"\n",sequence); // every .m3u8 file completed .TSTS
     return ret;
 }
 

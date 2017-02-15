@@ -928,7 +928,7 @@ static void print_report(int is_last_report, int64_t timer_start)
             last_time = cur_time;
             return;
         }
-        if ((cur_time - last_time) < 500000)
+        if ((cur_time - last_time) < 500000) // every 500 ms logs
             return;
         last_time = cur_time;
     }
@@ -958,13 +958,13 @@ static void print_report(int is_last_report, int64_t timer_start)
             q = ost->quality / (float) FF_QP2LAMBDA;
 
         if (vid && enc->codec_type == AVMEDIA_TYPE_VIDEO) {
-            snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "q=%2.1f ", q);
+            snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "q=%.2f ", q);
         }
         if (!vid && enc->codec_type == AVMEDIA_TYPE_VIDEO) {
             float t = (av_gettime_relative() - timer_start) / 1000000.0;
 
             frame_number = ost->frame_number;
-            snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "frame=%5d fps=%3d q=%3.1f ",
+            snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "frame=%d fps=%d q=%.2f ",
                      frame_number, (t > 1) ? (int)(frame_number / t + 0.5) : 0, q);
             if (is_last_report)
                 snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "L");
@@ -1016,14 +1016,14 @@ FF_ENABLE_DEPRECATION_WARNINGS
     bitrate = (double)(total_size * 8) / ti1 / 1000.0;
 
     snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf),
-            "size=%8.0fkB time=%0.2f bitrate=%6.1fkbits/s",
+            "size=%.0fkB time=%.2f bitrate=%.2fkbits/s",
             (double)total_size / 1024, ti1, bitrate);
 
     if (nb_frames_drop)
         snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), " drop=%d",
                  nb_frames_drop);
 
-    av_log(NULL, AV_LOG_INFO, "%s    \r", buf);
+    av_log(NULL, AV_LOG_INFO, "%s\n", buf); //.TSTS
 
     fflush(stderr);
 
